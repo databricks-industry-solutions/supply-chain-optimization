@@ -1,4 +1,8 @@
 # Databricks notebook source
+# MAGIC %md This notebook is available at https://github.com/databricks-industry-solutions/supply-chain-optimization
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC # Fine Grained Demand Forecasting
 
@@ -172,4 +176,9 @@ display(spark.sql(f"SELECT * FROM {dbName}.distribution_center_demand"))
 
 # COMMAND ----------
 
-
+# MAGIC %md 
+# MAGIC &copy; 2022 Databricks, Inc. All rights reserved. The source in this notebook is provided subject to the Databricks License [https://databricks.com/db-license-source].  All included or referenced third party libraries are subject to the licenses set forth below.
+# MAGIC 
+# MAGIC | library                                | description             | license    | source                                              |
+# MAGIC |----------------------------------------|-------------------------|------------|-----------------------------------------------------|
+# MAGIC | pulp                                 | A python Linear Programming API      | https://github.com/coin-or/pulp/blob/master/LICENSE        | https://github.com/coin-or/pulp                      |

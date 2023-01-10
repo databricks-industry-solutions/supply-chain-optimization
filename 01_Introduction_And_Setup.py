@@ -1,4 +1,8 @@
 # Databricks notebook source
+# MAGIC %md This notebook is available at https://github.com/databricks-industry-solutions/supply-chain-optimization
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC # Introduction
 # MAGIC 
@@ -18,11 +22,8 @@
 # MAGIC   - For the demand series for each product within each store we generate a one-week-ahead forecast
 # MAGIC   - For distribution center, we derive next week's estimated demand for each product
 # MAGIC - *Minimization of transportation costs*: From the cost and constraints tables of producing by and shipping from a plant to a distribution center we derive cost-optimal transportation.
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC <img src="https://raw.githubusercontent.com/databricks-industry-solutions/supply-chain-optimization/main/pictures/Plant_DistributionCenter_Store_Prouct_2.png?token=GHSAT0AAAAAAB46Q6LR4XK4XHT2HQVM44CQY5YKVBA" width=70%>
+# MAGIC 
+# MAGIC <img src="https://raw.githubusercontent.com/databricks-industry-solutions/supply-chain-optimization/main/pictures/Plant_DistributionCenter_Store_Prouct_2.png" width=70%>
 
 # COMMAND ----------
 
