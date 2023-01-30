@@ -11,11 +11,11 @@
 # MAGIC %md
 # MAGIC *Prerequisite: Make sure to run 01_Introduction_And_Setup before running this notebook.*
 # MAGIC 
-# MAGIC In this notebook we to a one-week-ahead forecast to estimate next week's demand for each store and product. We then aggregate on a distribution center level for each product.
+# MAGIC In this notebook we execute one-week-ahead forecast to estimate next week's demand for each store and product. We then aggregate on a distribution center level for each product.
 # MAGIC 
 # MAGIC Key highlights for this notebook:
 # MAGIC - Use Databricks' collaborative and interactive notebook environment to find an appropriate time series mdoel
-# MAGIC - Pandas UDFs (user-defined functions) can take your single-node data science code, and distribute it across different keys  
+# MAGIC - Use Pandas UDFs (user-defined functions) to take your single-node data science code, and distribute it across multiple nodes
 
 # COMMAND ----------
 
@@ -58,6 +58,7 @@ display(demand_df)
 
 # MAGIC %md
 # MAGIC ## One-step ahead forecast via Holt’s Winters Seasonal Method
+# MAGIC Holt-Winters’ method is based on triple exponential smoothing and is able to account for both trend and seasonality.
 
 # COMMAND ----------
 
@@ -177,8 +178,12 @@ display(spark.sql(f"SELECT * FROM {dbName}.distribution_center_demand"))
 # COMMAND ----------
 
 # MAGIC %md 
-# MAGIC &copy; 2022 Databricks, Inc. All rights reserved. The source in this notebook is provided subject to the Databricks License [https://databricks.com/db-license-source].  All included or referenced third party libraries are subject to the licenses set forth below.
+# MAGIC &copy; 2023 Databricks, Inc. All rights reserved. The source in this notebook is provided subject to the Databricks License [https://databricks.com/db-license-source].  All included or referenced third party libraries are subject to the licenses set forth below.
 # MAGIC 
 # MAGIC | library                                | description             | license    | source                                              |
 # MAGIC |----------------------------------------|-------------------------|------------|-----------------------------------------------------|
 # MAGIC | pulp                                 | A python Linear Programming API      | https://github.com/coin-or/pulp/blob/master/LICENSE        | https://github.com/coin-or/pulp                      |
+
+# COMMAND ----------
+
+
