@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %md This notebook is available at https://github.com/databricks-industry-solutions/supply-chain-optimization
+# MAGIC %md This notebook is available at https://github.com/databricks-industry-solutions/supply-chain-optimization. For more information about this solution accelerator, visit https://www.databricks.com/solutions/accelerators/supply-chain-distribution-optimization.
 
 # COMMAND ----------
 
@@ -10,9 +10,9 @@
 
 # MAGIC %md
 # MAGIC *Prerequisite: Make sure to run 01_Introduction_And_Setup before running this notebook.*
-# MAGIC 
+# MAGIC
 # MAGIC In this notebook we execute one-week-ahead forecast to estimate next week's demand for each store and product. We then aggregate on a distribution center level for each product.
-# MAGIC 
+# MAGIC
 # MAGIC Key highlights for this notebook:
 # MAGIC - Use Databricks' collaborative and interactive notebook environment to find an appropriate time series mdoel
 # MAGIC - Use Pandas UDFs (user-defined functions) to take your single-node data science code, and distribute it across multiple nodes
@@ -179,7 +179,7 @@ display(spark.sql(f"SELECT * FROM {dbName}.distribution_center_demand"))
 
 # MAGIC %md 
 # MAGIC &copy; 2023 Databricks, Inc. All rights reserved. The source in this notebook is provided subject to the Databricks License [https://databricks.com/db-license-source].  All included or referenced third party libraries are subject to the licenses set forth below.
-# MAGIC 
+# MAGIC
 # MAGIC | library                                | description             | license    | source                                              |
 # MAGIC |----------------------------------------|-------------------------|------------|-----------------------------------------------------|
 # MAGIC | pulp                                 | A python Linear Programming API      | https://github.com/coin-or/pulp/blob/master/LICENSE        | https://github.com/coin-or/pulp                      |

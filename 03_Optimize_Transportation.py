@@ -1,5 +1,5 @@
 # Databricks notebook source
-# MAGIC %md This notebook is available at https://github.com/databricks-industry-solutions/supply-chain-optimization
+# MAGIC %md This notebook is available at https://github.com/databricks-industry-solutions/supply-chain-optimization. For more information about this solution accelerator, visit https://www.databricks.com/solutions/accelerators/supply-chain-distribution-optimization.
 
 # COMMAND ----------
 
@@ -10,20 +10,20 @@
 
 # MAGIC %md
 # MAGIC *Prerequisite: Make sure to run 02_Fine_Grained_Demand_Forecasting before running this notebook.*
-# MAGIC 
+# MAGIC
 # MAGIC In this notebook we solve the LP to optimize transport costs when shipping products from the plants to the distribution centers. Furthermore, we show how to scale to hundreds of thousands of products.
-# MAGIC 
+# MAGIC
 # MAGIC Key highlights for this notebook:
 # MAGIC - Use Databricks' collaborative and interactive notebook environment to find optimization procedure
 # MAGIC - Pandas UDFs (user-defined functions) can take your single-node data science code, and distribute it across multiple nodes 
-# MAGIC 
+# MAGIC
 # MAGIC More precisely we solve the following optimzation problem for each product.
-# MAGIC 
+# MAGIC
 # MAGIC *Mathematical goal:*
 # MAGIC We have a set of manufacturing plants that distribute products to a set of distribution centers. The goal is to minimize overall shipment costs, i.e. we minimize w.r.t. quantities: <br/>
 # MAGIC cost_of_plant_1_to_distribution_center_1 * quantity_shipped_of_plant_1_to_distribution_center_1 <br/> \+ … \+ <br/>
 # MAGIC cost_of_plant_1_to_distribution_center_n * quantity_shipped_of_plant_n_to_distribution_center_m 
-# MAGIC 
+# MAGIC
 # MAGIC *Mathematical constraints:*
 # MAGIC - Quantities shipped must be zero or positive integers
 # MAGIC - The sum of products shipped from one manufacturing plant does not exceed its maximum supply 
@@ -260,7 +260,7 @@ display(spark.sql(f"SELECT * FROM {dbName}.shipment_recommendations"))
 
 # MAGIC %md 
 # MAGIC &copy; 2023 Databricks, Inc. All rights reserved. The source in this notebook is provided subject to the Databricks License [https://databricks.com/db-license-source].  All included or referenced third party libraries are subject to the licenses set forth below.
-# MAGIC 
+# MAGIC
 # MAGIC | library                                | description             | license    | source                                              |
 # MAGIC |----------------------------------------|-------------------------|------------|-----------------------------------------------------|
 # MAGIC | pulp                                 | A python Linear Programming API      | https://github.com/coin-or/pulp/blob/master/LICENSE        | https://github.com/coin-or/pulp                      |
