@@ -14,7 +14,7 @@ A manufacturer for power tools has 3 plants and delivers a set of 30 products to
 - We have the demand series for each product in each hardware store
 - We have a mapping table that uniquely assigns each distribution center to a hardware store. This assumption is a simplification as it is possible that one hardware store obtains products from  different distribution centers
 - We have a table that assignes the costs of shipping a product from each plant to each distribution center
-- We have a table of the maximum qunatities that can be produced by and shipped from each plant to each of the distribution centers
+- We have a table of the maximum quantities that can be produced by and shipped from each plant to each of the distribution centers
 
 **We proceeed in 2 steps**:
 - *Demand Forecasting*: Derive next week's demand for each product and distribution center: 
