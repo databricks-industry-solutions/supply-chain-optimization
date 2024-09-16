@@ -1,7 +1,7 @@
 # Databricks notebook source
 dbutils.widgets.dropdown('reset_all_data', 'false', ['true', 'false'], 'Reset all data')
-dbutils.widgets.text('dbName',  'supply_chain_optimization_max_kohler' , 'Database Name')
-dbutils.widgets.text('cloud_storage_path',  '/Users/max.kohler@databricks.com/field_demos/supply_chain_optimization', 'Storage Path')
+dbutils.widgets.text('catalogName',  'supply_chain_optimization_catalog_max_kohler' , 'Catalog Name')
+dbutils.widgets.text('dbName',  'sco_data' , 'Database Name')
 
 # COMMAND ----------
 
@@ -9,15 +9,20 @@ print("Starting ./_resources/01-data-generator")
 
 # COMMAND ----------
 
-cloud_storage_path = dbutils.widgets.get('cloud_storage_path')
+catalogName = dbutils.widgets.get('catalogName')
 dbName = dbutils.widgets.get('dbName')
 reset_all_data = dbutils.widgets.get('reset_all_data') == 'true'
 
 # COMMAND ----------
 
-print(cloud_storage_path)
-print(dbName)
-print(reset_all_data)
+print(f"The catalog {catalogName} will be used")
+print(f"The database {dbName} will be used")
+print(f"Running withreset_all_data = {reset_all_data}")
+
+# COMMAND ----------
+
+spark.sql(f"""USE CATALOG {catalogName}""")
+spark.sql(f"""USE {dbName}""")
 
 # COMMAND ----------
 
@@ -269,12 +274,12 @@ display(demand_df)
 # COMMAND ----------
 
 # Test if demand is in a realistic range
-#display(demand_df.groupBy("product", "store").mean("demand"))
+# display(demand_df.groupBy("product", "store").mean("demand"))
 
 # COMMAND ----------
 
 # Select a sepecific time series
-# display(demand_df.join(demand_df.sample(False, 1 / demand_df.count(), seed=0).limit(1).select("product", "store"), on=["product", "store"], how="inner"))
+#display(demand_df.join(demand_df.sample(False, 1 / demand_df.count(), seed=0).limit(1).select("product", "store"), on=["product", "store"], how="inner"))
 
 # COMMAND ----------
 
@@ -283,28 +288,19 @@ display(demand_df)
 
 # COMMAND ----------
 
-demand_df_delta_path = os.path.join(cloud_storage_path, 'demand_df_delta')
+demand_df.write.mode("overwrite").saveAsTable("part_level_demand")
+
+#### table not yet stored
 
 # COMMAND ----------
 
-# Write the data 
-demand_df.write \
-.mode("overwrite") \
-.format("delta") \
-.save(demand_df_delta_path)
+# MAGIC %sql
+# MAGIC SELECT * FROM part_level_demand
 
 # COMMAND ----------
 
-spark.sql(f"DROP TABLE IF EXISTS {dbName}.part_level_demand")
-spark.sql(f"CREATE TABLE {dbName}.part_level_demand USING DELTA LOCATION '{demand_df_delta_path}'")
-
-# COMMAND ----------
-
-display(spark.sql(f"SELECT * FROM {dbName}.part_level_demand"))
-
-# COMMAND ----------
-
-display(spark.sql(f"SELECT COUNT(*) as row_count FROM {dbName}.part_level_demand"))
+# MAGIC %sql
+# MAGIC SELECT COUNT(*) as row_count FROM part_level_demand
 
 # COMMAND ----------
 
@@ -370,24 +366,7 @@ display(distribution_center_to_store_mapping_table)
 
 # COMMAND ----------
 
-distribution_center_to_store_mapping_delta_path = os.path.join(cloud_storage_path, 'distribution_center_to_store_mapping')
-
-# COMMAND ----------
-
-# Write the data 
-distribution_center_to_store_mapping_table.write \
-.mode("overwrite") \
-.format("delta") \
-.save(distribution_center_to_store_mapping_delta_path)
-
-# COMMAND ----------
-
-spark.sql(f"DROP TABLE IF EXISTS {dbName}.distribution_center_to_store_mapping_table")
-spark.sql(f"CREATE TABLE {dbName}.distribution_center_to_store_mapping_table USING DELTA LOCATION '{distribution_center_to_store_mapping_delta_path}'")
-
-# COMMAND ----------
-
-display(spark.sql(f"SELECT * FROM {dbName}.distribution_center_to_store_mapping_table"))
+distribution_center_to_store_mapping_table.write.mode("overwrite").saveAsTable("distribution_center_to_store_mapping_table")
 
 # COMMAND ----------
 
@@ -407,8 +386,8 @@ display(plants_df)
 
 # COMMAND ----------
 
-tmp_map_distribution_center_to_store = spark.read.table(f"{dbName}.distribution_center_to_store_mapping_table")
-distribution_center_df = (spark.read.table(f"{dbName}.part_level_demand").
+tmp_map_distribution_center_to_store = spark.read.table("distribution_center_to_store_mapping_table")
+distribution_center_df = (spark.read.table("part_level_demand").
                           select("product","store").
                           join(tmp_map_distribution_center_to_store, ["store"],  how="inner").
                           select("product","distribution_center").
@@ -476,24 +455,7 @@ display(transport_cost_table)
 
 # COMMAND ----------
 
-cost_table_delta_path = os.path.join(cloud_storage_path, 'cost_table')
-
-# COMMAND ----------
-
-# Write the data 
-transport_cost_table.write \
-.mode("overwrite") \
-.format("delta") \
-.save(cost_table_delta_path)
-
-# COMMAND ----------
-
-spark.sql(f"DROP TABLE IF EXISTS {dbName}.transport_cost_table")
-spark.sql(f"CREATE TABLE {dbName}.transport_cost_table USING DELTA LOCATION '{cost_table_delta_path}'")
-
-# COMMAND ----------
-
-display(spark.sql(f"SELECT * FROM {dbName}.transport_cost_table"))
+transport_cost_table.write.mode("overwrite").saveAsTable("transport_cost_table")
 
 # COMMAND ----------
 
@@ -503,7 +465,7 @@ display(spark.sql(f"SELECT * FROM {dbName}.transport_cost_table"))
 # COMMAND ----------
 
 # Create a list with all plants
-all_plants = spark.read.table(f"{dbName}.transport_cost_table").select("plant").distinct().collect()
+all_plants = spark.read.table(f"transport_cost_table").select("plant").distinct().collect()
 all_plants = [row[0] for row in all_plants]
 
 # Create a list with fractions: Sum must be larger than one to fullfill the demands
@@ -514,8 +476,8 @@ fractions_lst.append(max( 0.4,  1 - sum(fractions_lst)))
 plant_supply_in_percentage_of_demand = {all_plants[i]: fractions_lst[i] for i in range(len(all_plants))}
 
 #Get maximum demand in history and sum up the demand of all distribution centers
-map_store_to_dc_tmp = spark.read.table(f"{dbName}.distribution_center_to_store_mapping_table")
-max_demands_per_dc = (spark.read.table(f"{dbName}.part_level_demand").
+map_store_to_dc_tmp = spark.read.table(f"distribution_center_to_store_mapping_table")
+max_demands_per_dc = (spark.read.table(f"part_level_demand").
                       groupBy("product", "store").
                       agg(f.max("demand").alias("demand")).
                       join(map_store_to_dc_tmp, ["store"], how = "inner"). # This join will not produce duplicates, as one store is assigned to exactly one distribution center
@@ -532,37 +494,17 @@ plant_supply = max_demands_per_dc.select("product", *all_plants).sort("product")
 
 # COMMAND ----------
 
-display(spark.read.table(f"{dbName}.distribution_center_to_store_mapping_table"))
-
-# COMMAND ----------
-
-display(spark.read.table(f"{dbName}.part_level_demand"))
-
-# COMMAND ----------
-
 # MAGIC %md
 # MAGIC Save as a Delta table
 
 # COMMAND ----------
 
-supply_table_delta_path = os.path.join(cloud_storage_path, 'supply_table')
+plant_supply.write.mode("overwrite").saveAsTable("supply_table")
 
 # COMMAND ----------
 
-# Write the data 
-plant_supply.write \
-.mode("overwrite") \
-.format("delta") \
-.save(supply_table_delta_path)
-
-# COMMAND ----------
-
-spark.sql(f"DROP TABLE IF EXISTS {dbName}.supply_table")
-spark.sql(f"CREATE TABLE {dbName}.supply_table USING DELTA LOCATION '{supply_table_delta_path}'")
-
-# COMMAND ----------
-
-display(spark.sql(f"SELECT * FROM {dbName}.supply_table"))
+# MAGIC %sql
+# MAGIC SELECT * FROM supply_table
 
 # COMMAND ----------
 

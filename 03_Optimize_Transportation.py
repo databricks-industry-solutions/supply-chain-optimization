@@ -42,11 +42,6 @@
 
 # COMMAND ----------
 
-print(cloud_storage_path)
-print(dbName)
-
-# COMMAND ----------
-
 import os
 import datetime as dt
 import re
@@ -57,6 +52,11 @@ import pulp
 
 import pyspark.sql.functions as f
 from pyspark.sql.types import *
+
+# COMMAND ----------
+
+spark.sql(f"""USE CATALOG {catalogName}""")
+spark.sql(f"""USE {dbName}""")
 
 # COMMAND ----------
 
@@ -213,13 +213,6 @@ def transport_optimization(pdf: pd.DataFrame) -> pd.DataFrame:
 
 # COMMAND ----------
 
-# Test the function
-#product_selection = "nail_1"
-# pdf = lp_table_all_info.filter(f.col("product")==product_selection).toPandas()
-# transport_optimization(pdf)
-
-# COMMAND ----------
-
 spark.conf.set("spark.databricks.optimizer.adaptive.enabled", "false")
 n_tasks = lp_table_all_info.select("product").distinct().count()
 
@@ -237,24 +230,13 @@ optimal_transport_df = (
 
 # COMMAND ----------
 
-shipment_recommendations_df_delta_path = os.path.join(cloud_storage_path, 'shipment_recommendations_df_delta')
+optimal_transport_df.write.mode("overwrite").saveAsTable("shipment_recommendations")
 
 # COMMAND ----------
 
-# Write the data 
-optimal_transport_df.write \
-.mode("overwrite") \
-.format("delta") \
-.save(shipment_recommendations_df_delta_path)
+from pyspark.sql.functions import col
 
-# COMMAND ----------
-
-spark.sql(f"DROP TABLE IF EXISTS {dbName}.shipment_recommendations")
-spark.sql(f"CREATE TABLE {dbName}.shipment_recommendations USING DELTA LOCATION '{shipment_recommendations_df_delta_path}'")
-
-# COMMAND ----------
-
-display(spark.sql(f"SELECT * FROM {dbName}.shipment_recommendations"))
+display(spark.read.table('shipment_recommendations'))
 
 # COMMAND ----------
 

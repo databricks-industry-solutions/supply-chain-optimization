@@ -23,8 +23,8 @@
 
 # COMMAND ----------
 
-print(cloud_storage_path)
-print(dbName)
+spark.sql(f"""USE CATALOG {catalogName}""")
+spark.sql(f"""USE {dbName}""")
 
 # COMMAND ----------
 
@@ -156,24 +156,12 @@ display(distribution_center_demand)
 
 # COMMAND ----------
 
-distribution_center_demand_df_delta_path = os.path.join(cloud_storage_path, 'distribution_center_demand_df_delta')
+distribution_center_demand.write.mode("overwrite").saveAsTable("distribution_center_demand")
 
 # COMMAND ----------
 
-# Write the data 
-distribution_center_demand.write \
-.mode("overwrite") \
-.format("delta") \
-.save(distribution_center_demand_df_delta_path)
-
-# COMMAND ----------
-
-spark.sql(f"DROP TABLE IF EXISTS {dbName}.distribution_center_demand")
-spark.sql(f"CREATE TABLE {dbName}.distribution_center_demand USING DELTA LOCATION '{distribution_center_demand_df_delta_path}'")
-
-# COMMAND ----------
-
-display(spark.sql(f"SELECT * FROM {dbName}.distribution_center_demand"))
+# MAGIC %sql
+# MAGIC select * from distribution_center_demand
 
 # COMMAND ----------
 
