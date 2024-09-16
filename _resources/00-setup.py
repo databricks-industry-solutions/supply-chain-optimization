@@ -10,7 +10,7 @@ db_prefix = "supply_chain_optimization"
 
 # COMMAND ----------
 
-dbName = "sco_data_james"
+dbName = "sco_data"
 catalogPrefix = "supply_chain_optimization_catalog"
 
 # COMMAND ----------
